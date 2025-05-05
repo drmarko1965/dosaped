@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DosaPed</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        
+        #dosaped-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .dosaped-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .dosaped-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 0 0 0 10px;
+        }
+        
+        .dosaped-subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .dosaped-warning {
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+        
+        .dosaped-form-group {
+            margin-bottom: 16px;
+        }
+        
+        .dosaped-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .dosaped-select, .dosaped-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .dosaped-button {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .dosaped-button:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .dosaped-button-gray {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        
+        .dosaped-button-gray:hover {
+            background-color: #d1d5db;
+        }
+        
+        .dosaped-error {
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+            color: #b91c1c;
+            display: none;
+        }
+        
+        .dosaped-result {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .dosaped-result-title {
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        
+        .dosaped-note {
+            margin-top: 12px;
+            padding: 8px;
+            background-color: #fee2e2;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #b91c1c;
+            display: none;
+        }
+        
+        .dosaped-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .dosaped-flex-button {
+            flex: 1;
+        }
+        
+        .dosaped-disclaimer-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        
+        .dosaped-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .dosaped-modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #dc2626;
+        }
+        
+        .dosaped-disclaimer-text {
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 16px;
+        }
+        
+        .dosaped-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 10px 0;
+            line-height: 1.4;
+        }
+        
+        .dosaped-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .dosaped-checkbox input {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="dosaped-container">
+        <div class="dosaped-header">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5"></circle>
+                <path d="M8 14h8a4 4 0 0 1 4 4v1H4v-1a4 4 0 0 1 4-4z"></path>
+            </svg>
+            <h1 class="dosaped-title">DosaPed</h1>
+        </div>
+        <p class="dosaped-subtitle">Calcolo dosaggio per farmaci pediatrici</p>
+        
+        <div class="dosaped-warning">
+            <p style="font-size: 14px; font-weight: 500; margin: 0;">Non superare mai i dosaggi indicati e rispettare sempre gli intervalli orari consigliati, a meno che il pediatra non abbia fornito indicazioni diverse.</p>
+        </div>
+        
+        <div class="dosaped-form-group">
+            <label class="dosaped-label">Farmaco</label>
+            <select id="dosaped-farmaco" class="dosaped-select">
+                <option value="">-- Seleziona --</option>
+                <option value="paracetamolo">Paracetamolo</option>
+                <option value="ibuprofene">Ibuprofene</option>
+            </select>
+        </div>
+        
+        <div class="dosaped-form-group">
+            <label class="dosaped-label">Formulazione</label>
+            <select id="dosaped-formulazione" class="dosaped-select" disabled>
+                <option value="">-- Seleziona --</option>
+            </select>
+        </div>
+        
+        <div class="dosaped-form-group">
+            <label class="dosaped-label">Peso (kg)</label>
+            <input type="number" id="dosaped-peso" class="dosaped-input" placeholder="Inserisci il peso" min="0" step="0.1">
+        </div>
+        
+        <div id="dosaped-buttons-container" class="dosaped-form-group">
+            <button id="dosaped-calcola" class="dosaped-button">Calcola dosaggio</button>
+        </div>
+        
+        <div id="dosaped-error" class="dosaped-error"></div>
+        
+        <div id="dosaped-result" class="dosaped-result">
+            <h2 class="dosaped-result-title">Risultato</h2>
+            <div id="dosaped-result-text"></div>
+            <p id="dosaped-avvertenza" class="dosaped-note"></p>
+        </div>
+        
+        <div id="dosaped-disclaimer-modal" class="dosaped-disclaimer-modal">
+            <div class="dosaped-modal-content">
+                <h2 class="dosaped-modal-title">Importante: Limitazione di Responsabilità</h2>
+                
+                <div class="dosaped-disclaimer-text">
+                    <p>Questa applicazione fornisce indicazioni sui dosaggi di farmaci pediatrici a solo scopo informativo. Utilizzando questa applicazione l'utente riconosce e accetta che:</p>
+                    
+                    <ul class="dosaped-list">
+                        <li>Le informazioni fornite non costituiscono consiglio medico professionale e non sostituiscono la consulenza di un medico o pediatra.</li>
+                        <li>I dosaggi suggeriti si basano sulle schede tecniche standard dei farmaci, ma il medico potrebbe prescrivere dosaggi diversi in base alle specifiche necessità del paziente.</li>
+                        <li>L'utente è il solo ed esclusivo responsabile per qualsiasi utilizzo delle informazioni ottenute tramite questa applicazione.</li>
+                        <li>I creatori dell'applicazione declinano ogni responsabilità per eventuali conseguenze derivanti dall'uso improprio delle informazioni fornite.</li>
+                        <li>È sempre necessario consultare un medico per qualsiasi decisione relativa alla salute dei bambini.</li>
+                        <li>Dopo 3 giorni di trattamento è indispensabile consultare sempre il pediatra.</li>
+                    </ul>
+                    
+                    <p style="font-weight: 500; margin-top: 8px;">Questa applicazione non promuove l'automedicazione ma un uso più consapevole e sicuro dei farmaci da banco, nel rispetto delle indicazioni del pediatra curante.</p>
+                </div>
+                
+                <div class="dosaped-checkbox">
+                    <input type="checkbox" id="dosaped-accetto">
+                    <label for="dosaped-accetto" style="font-size: 13px; font-weight: 500;">Ho letto e accetto le condizioni d'uso</label>
+                </div>
+                
+                <button id="dosaped-continua" class="dosaped-button" disabled style="opacity: 0.5;">Continua all'applicazione</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const disclaimerModal = document.getElementById('dosaped-disclaimer-modal');
+            const accettoCheckbox = document.getElementById('dosaped-accetto');
+            const continuaButton = document.getElementById('dosaped-continua');
+            const farmacoSelect = document.getElementById('dosaped-farmaco');
+            const formulazioneSelect = document.getElementById('dosaped-formulazione');
+            const pesoInput = document.getElementById('dosaped-peso');
+            const calcolaButton = document.getElementById('dosaped-calcola');
+            const erroreDiv = document.getElementById('dosaped-error');
+            const resultDiv = document.getElementById('dosaped-result');
+            const resultText = document.getElementById('dosaped-result-text');
+            const avvertenzaText = document.getElementById('dosaped-avvertenza');
+            const buttonsContainer = document.getElementById('dosaped-buttons-container');
+            
+            // State
+            let disclaimerAccettato = false;
+            
+            // Disclaimer handling
+            accettoCheckbox.addEventListener('change', function() {
+                continuaButton.disabled = !this.checked;
+                continuaButton.style.opacity = this.checked ? '1' : '0.5';
+            });
+            
+            continuaButton.addEventListener('click', function() {
+                if (accettoCheckbox.checked) {
+                    disclaimerAccettato = true;
+                    disclaimerModal.style.display = 'none';
+                }
+            });
+            
+            // Farmaco select handling
+            farmacoSelect.addEventListener('change', function() {
+                const categoria = this.value;
+                
+                // Reset the form
+                resultDiv.style.display = 'none';
+                erroreDiv.style.display = 'none';
+                formulazioneSelect.value = '';
+                formulazioneSelect.disabled = !categoria;
+                
+                // Clear previous options
+                while (formulazioneSelect.options.length > 1) {
+                    formulazioneSelect.remove(1);
+                }
+                
+                // Add options based on selected drug
+                if (categoria === 'paracetamolo') {
+                    aggiungiOpzione(formulazioneSelect, 'sciroppo', 'Sciroppo/Sospensione orale 120 mg/5 ml');
+                    aggiungiOpzione(formulazioneSelect, 'gocce', 'Gocce');
+                    aggiungiOpzione(formulazioneSelect, 'compresse500', 'Compresse 500 mg');
+                    aggiungiOpzione(formulazioneSelect, 'bustine250', 'Bustine orosolubili 250 mg');
+                    aggiungiOpzione(formulazioneSelect, 'bustine500', 'Bustine orosolubili 500 mg');
+                    aggiungiOpzione(formulazioneSelect, 'supposte', 'Supposte');
+                } else if (categoria === 'ibuprofene') {
+                    aggiungiOpzione(formulazioneSelect, 'sospensione100', 'Sospensione 100 mg');
+                    aggiungiOpzione(formulazioneSelect, 'sospensione200', 'Sospensione 200 mg');
+                    aggiungiOpzione(formulazioneSelect, 'compresse', 'Compresse 200 mg (>12 anni)');
+                    aggiungiOpzione(formulazioneSelect, 'supposte', 'Supposte');
+                }
+            });
+            
+            // Formulazione select handling
+            formulazioneSelect.addEventListener('change', function() {
+                resultDiv.style.display = 'none';
+            });
+            
+            // Calculate button handling
+            calcolaButton.addEventListener('click', function() {
+                if (!disclaimerAccettato) {
+                    disclaimerModal.style.display = 'flex';
+                    return;
+                }
+                
+                calcolaDosaggio();
+            });
+            
+            // Helper functions
+            function aggiungiOpzione(select, value, text) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = text;
+                select.appendChild(option);
+            }
+            
+            function mostraErrore(messaggio) {
+                erroreDiv.textContent = messaggio;
+                erroreDiv.style.display = 'block';
+            }
+            
+            function calcolaDosaggio() {
+                // Reset messages
+                erroreDiv.style.display = 'none';
+                resultDiv.style.display = 'none';
+                
+                // Get values
+                const farmaco = farmacoSelect.value;
+                const formulazione = formulazioneSelect.value;
+                const pesoValue = pesoInput.value;
+                
+                // Validation
+                const pesoNum = parseFloat(pesoValue);
+                
+                if (isNaN(pesoNum) || pesoNum <= 0) {
+                    mostraErrore('Inserisci un peso valido maggiore di 0 kg');
+                    return;
+                }
+                
+                if (pesoNum > 60) {
+                    mostraErrore('Il peso inserito è troppo alto per un dosaggio pediatrico. Consulta un medico.');
+                    return;
+                }
+                
+                if (!farmaco) {
+                    mostraErrore('Seleziona un farmaco');
+                    return;
+                }
+                
+                if (!formulazione) {
+                    mostraErrore('Seleziona una formulazione');
+                    return;
+                }
+                
+                // Calculate dosage (max 40kg)
+                const pesoCalcolo = Math.min(pesoNum, 40);
+                
+                // Generate results based on drug and formulation
+                generaRisultato(farmaco, formulazione, pesoNum, pesoCalcolo);
+                
+                // Update buttons
+                buttonsContainer.innerHTML = `
+                    <div class="dosaped-buttons">
+                        <button id="dosaped-reset" class="dosaped-button dosaped-button-gray dosaped-flex-button">Nuova ricerca</button>
+                        <button id="dosaped-ricalcola" class="dosaped-button dosaped-flex-button">Ricalcola</button>
+                    </div>
+                `;
+                
+                // Re-attach event listeners
+                document.getElementById('dosaped-reset').addEventListener('click', function() {
+                    pesoInput.value = '';
+                    resultDiv.style.display = 'none';
+                    erroreDiv.style.display = 'none';
+                    
+                    // Reset buttons
+                    buttonsContainer.innerHTML = `
+                        <button id="dosaped-calcola" class="dosaped-button">Calcola dosaggio</button>
+                    `;
+                    
+                    document.getElementById('dosaped-calcola').addEventListener('click', function() {
+                        if (!disclaimerAccettato) {
+                            disclaimerModal.style.display = 'flex';
+                            return;
+                        }
+                        
+                        calcolaDosaggio();
+                    });
+                });
+                
+                document.getElementById('dosaped-ricalcola').addEventListener('click', function() {
+                    calcolaDosaggio();
+                });
+            }
+            
+            function generaRisultato(cat, form, pesoNum, pesoCalcolo) {
+                let risultatoText = '';
+                let avvertenzaText = '';
+                
+                // PARACETAMOLO
+                if (cat === 'paracetamolo') {
+                    switch(form) {
+                        // Sciroppo
+                        case 'sciroppo':
+                            if (pesoNum < 7) {
+                                risultatoText = 'Controindicato per bambini con peso inferiore a 7 kg';
+                                avvertenzaText = 'Per bambini con peso inferiore a 7 kg, consultare il pediatra per formulazioni alternative';
+                            } else {
+                                risultatoText = `${(pesoCalcolo * 0.6).toFixed(1)} ml ogni 4-6 ore`;
+                                avvertenzaText = 'Non superare le 5 somministrazioni nelle 24 ore';
+                            }
+                            break;
+                        
+                        // Gocce
+                        case 'gocce':
+                            if (pesoNum > 11) {
+                                risultatoText = 'Non consigliato per bambini con peso superiore a 11 kg';
+                                avvertenzaText = 'Preferire sciroppo o altre formulazioni';
+                            } else {
+                                const gocceMin = Math.round(pesoNum * 3);
+                                const gocceMax = Math.round(pesoNum * 4);
+                                risultatoText = `${gocceMin}-${gocceMax} gocce ogni 6 ore (non più di 4 volte al giorno)`;
+                                avvertenzaText = 'Salvo diversa indicazione del pediatra';
+                            }
+                            break;
+                            
+                        // Compresse 500 mg
+                        case 'compresse500':
+                            if (pesoNum < 21) {
+                                risultatoText = 'Non consigliato per bambini con peso inferiore a 21 kg';
+                                avvertenzaText = 'Utilizzare sciroppo o altre formulazioni adatte';
+                            } else if (pesoNum <= 25) {
+                                risultatoText = '1/2 compressa ogni 4 ore (fino a 6 volte al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata';
+                            } else if (pesoNum <= 40) {
+                                risultatoText = '1 compressa ogni 6 ore (fino a 4 volte al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata';
+                            } else {
+                                risultatoText = '1 compressa ogni 4 ore (fino a 6 volte al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata';
+                            }
+                            break;
+                            
+                        // Bustine 250 mg
+                        case 'bustine250':
+                            if (pesoNum < 17) {
+                                risultatoText = 'Non consigliato per bambini con peso inferiore a 17 kg';
+                                avvertenzaText = 'Utilizzare sciroppo o altre formulazioni adatte per bambini di peso inferiore';
+                            } else if (pesoNum <= 25) {
+                                risultatoText = '1 bustina ogni 6 ore (fino a 4 volte al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata, salvo diversa indicazione del pediatra';
+                            } else {
+                                risultatoText = 'Non consigliato per bambini con peso superiore a 25 kg';
+                                avvertenzaText = 'Per pesi superiori utilizzare formulazioni da 500 mg';
+                            }
+                            break;
+                            
+                        // Bustine 500 mg
+                        case 'bustine500':
+                            if (pesoNum < 25) {
+                                risultatoText = 'Non consigliato per bambini con peso inferiore a 25 kg';
+                                avvertenzaText = 'Utilizzare bustine da 250 mg o altre formulazioni adatte per bambini di peso inferiore';
+                            } else if (pesoNum <= 40) {
+                                risultatoText = '1 bustina ogni 8 ore (fino a 3 volte al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata, salvo diversa indicazione del pediatra';
+                            } else {
+                                risultatoText = '1 bustina ogni 4-6 ore (fino a un massimo di 6 bustine al giorno)';
+                                avvertenzaText = 'Non superare la dose consigliata, salvo diversa indicazione del pediatra';
+                            }
+                            break;
+                            
+                        // Supposte
+                        case 'supposte':
+                            if (pesoNum < 6) {
+                                risultatoText = 'Consultare il pediatra per bambini con peso inferiore a 6 kg';
+                            } else if (pesoNum <= 10) {
+                                risultatoText = '1 supposta da 125 mg ogni 6 ore (non più di 4 volte al giorno)';
+                            } else if (pesoNum <= 20) {
+                                risultatoText = '1 supposta da 250 mg ogni 6 ore (max 4 volte al giorno)';
+                            } else if (pesoNum <= 25) {
+                                risultatoText = '1 supposta da 500 mg ogni 8 ore (max 3 volte al giorno)';
+                            } else if (pesoNum <= 40) {
+                                risultatoText = '1 supposta da 500 mg ogni 6 ore (max 4 volte al giorno)';
+                            } else {
+                                risultatoText = '1 supposta da 500 mg ogni 6 ore (max 4 volte al giorno)';
+                                avvertenzaText = 'L\'utilizzo delle supposte deve essere considerato in caso di vomito o di assunzione difficoltosa per via orale. Le supposte sono sconsigliate sopra i 40 kg';
+                                break;
+                            }
+                            avvertenzaText = 'L\'utilizzo delle supposte deve essere considerato in caso di vomito o di assunzione difficoltosa per via orale';
+                            break;
+                    }
+                }
+                
+                // IBUPROFENE
+                else if (cat === 'ibuprofene') {
+                    // Avvertenza base per ibuprofene
+                    const avvertenzaBase = 'L\'ibuprofene è sconsigliato: nei casi di gastroenterite, disidratazione e patologie respiratorie con broncospasmo';
+                    
+                    switch(form) {
+                        // Supposte
+                        case 'supposte':
+                            if (pesoNum < 6) {
+                                risultatoText = 'Non consigliato per bambini con peso inferiore a 6 kg';
+                            } else if (pesoNum <= 12.5) {
+                                risultatoText = '1 supposta da 60 mg ogni 6 ore (max 4 nelle 24 ore)';
+                            } else if (pesoNum <= 15) {
+                                risultatoText = '1 supposta da 125 mg ogni 8 ore (max 3 nelle 24 ore)';
+                            } else if (pesoNum <= 20) {
+                                risultatoText = '1 supposta da 125 mg ogni 6 ore (max 4 nelle 24 ore)';
+                            } else {
+                                risultatoText = 'Non indicate per bambini con peso superiore a 20 kg';
+                                avvertenzaText = `${avvertenzaBase}. L\'utilizzo delle supposte deve essere considerato in caso di vomito o di assunzione difficoltosa per via orale. Le supposte di ibuprofene sono indicate solo fino a 20 kg`;
+                                break;
+                            }
+                            avvertenzaText = `${avvertenzaBase}. L\'utilizzo delle supposte deve essere considerato in caso di vomito o di assunzione difficoltosa per via orale`;
+                            break;
+                            
+                        // Compresse
+                        case 'compresse':
+                            if (pesoNum < 40) {
+                                risultatoText = 'Non consigliato per bambini di peso inferiore a 40 kg o sotto i 12 anni';
+                            } else {
+                                risultatoText = '1-2 compresse (da 200 mg) ogni 6 ore (max 6 compresse nelle 24 ore)';
+                            }
+                            avvertenzaText = `${avvertenzaBase}. Le compresse di ibuprofene da 200 mg sono adatte solo per bambini sopra i 12 anni`;
+                            break;
+                            
+                        // Sospensione 100 mg
+                        case 'sospensione100':
+                            const doseConsigliata100 = (pesoCalcolo * 0.35).toFixed(1);
+                            const doseMassima100 = (pesoCalcolo * 0.5).toFixed(1);
+                            risultatoText = `Dose consigliata: ${doseConsigliata100} ml ogni 8 ore\nDose massima: ${doseMassima100} ml ogni 8 ore (in caso di stati febbrili)`;
+                            avvertenzaText = avvertenzaBase;
+                            break;
+                            
+                        // Sospensione 200 mg
+                        case 'sospensione200':
+                            const doseConsigliata200 = (pesoCalcolo * 0.17).toFixed(1);
+                            const doseMassima200 = (pesoCalcolo * 0.25).toFixed(1);
+                            risultatoText = `Dose consigliata: ${doseConsigliata200} ml ogni 8 ore\nDose massima: ${doseMassima200} ml ogni 8 ore (in caso di stati febbrili)`;
+                            avvertenzaText = avvertenzaBase;
+                            break;
+                    }
+                }
+                
+                // Display results
+                if (risultatoText) {
+                    resultText.innerHTML = '';
+                    
+                    // Handle multi-line results
+                    const risultatoLines = risultatoText.split('\n');
+                    for (let i = 0; i < risultatoLines.length; i++) {
+                        const p = document.createElement('p');
+                        p.textContent = risultatoLines[i];
+                        p.style.marginBottom = '8px';
+                        resultText.appendChild(p);
+                    }
+                    
+                    if (avvertenzaText) {
+                        avvertenzaText.textContent = avvertenzaText;
+                        avvertenzaText.style.display = 'block';
+                    } else {
+                        avvertenzaText.style.display = 'none';
+                    }
+                    
+                    resultDiv.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
